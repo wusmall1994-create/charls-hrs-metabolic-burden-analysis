@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the archived software release."
+title: "Analysis code for functional transitions under persistent metabolic burden in CHARLS and HRS"
+type: software
+version: 1.0.0
+date-released: 2026-09-05
+authors:
+  - family-names: Wu
+    given-names: Xiaoxin
+    affiliation: Longyan First Affiliated Hospital of Fujian Medical University
+  - family-names: Liang
+    given-names: Huadong
+    affiliation: Longyan First Affiliated Hospital of Fujian Medical University
+  - family-names: Qiu
+    given-names: Jianting
+    affiliation: The Second Hospital of Longyan
+license: MIT
+repository-code: "https://github.com/wusmall1994-create/charls-hrs-metabolic-burden-analysis"
+keywords:
+  - CHARLS
+  - HRS
+  - disability
+  - metabolic burden
+  - multiple imputation
+  - complex survey

@@ -1,0 +1,35 @@
+{
+  "title": "Analysis code for functional transitions under persistent metabolic burden in CHARLS and HRS",
+  "description": "Versioned statistical analysis code for harmonized CHARLS and HRS analyses of depressive symptoms, memory, sustained ADL independence, disability transition, and death under persistent metabolic burden. No participant-level data, derived data, numerical results, figures, or manuscript files are included.",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Wu, Xiaoxin",
+      "affiliation": "Longyan First Affiliated Hospital of Fujian Medical University"
+    },
+    {
+      "name": "Liang, Huadong",
+      "affiliation": "Longyan First Affiliated Hospital of Fujian Medical University"
+    },
+    {
+      "name": "Qiu, Jianting",
+      "affiliation": "The Second Hospital of Longyan"
+    }
+  ],
+  "keywords": [
+    "CHARLS",
+    "HRS",
+    "disability transition",
+    "persistent metabolic burden",
+    "multiple imputation",
+    "complex survey"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/wusmall1994-create/charls-hrs-metabolic-burden-analysis",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
