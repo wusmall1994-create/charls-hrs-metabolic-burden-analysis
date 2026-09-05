@@ -2,7 +2,10 @@
   "title": "Analysis code for functional transitions under persistent metabolic burden in CHARLS and HRS",
   "description": "Versioned statistical analysis code for harmonized CHARLS and HRS analyses of depressive symptoms, memory, sustained ADL independence, disability transition, and death under persistent metabolic burden. No participant-level data, derived data, numerical results, figures, or manuscript files are included.",
   "upload_type": "software",
-  "license": "MIT",
+  "version": "1.0.0",
+  "access_right": "open",
+  "license": "mit",
+  "language": "eng",
   "creators": [
     {
       "name": "Wu, Xiaoxin",
@@ -24,12 +27,5 @@
     "persistent metabolic burden",
     "multiple imputation",
     "complex survey"
-  ],
-  "related_identifiers": [
-    {
-      "identifier": "https://github.com/wusmall1994-create/charls-hrs-metabolic-burden-analysis",
-      "relation": "isSupplementTo",
-      "scheme": "url"
-    }
   ]
 }
