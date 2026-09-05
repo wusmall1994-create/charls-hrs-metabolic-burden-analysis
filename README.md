@@ -1,5 +1,7 @@
 # CHARLS–HRS persistent metabolic burden analysis
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22334763.svg)](https://doi.org/10.5281/zenodo.22334763)
+
 This repository contains the statistical analysis code used for the harmonized
 CHARLS–HRS study of depressive symptoms, memory, sustained activities-of-daily-
 living (ADL) independence, disability transition, and death among adults with
@@ -125,8 +127,8 @@ patterns. They do not access cohort data.
 ## Licence and citation
 
 The analysis code is released under the MIT License. Cite the versioned archival
-release rather than an unversioned branch. Citation metadata are provided in
-`CITATION.cff`; the DOI field will be added after archival publication.
+release rather than an unversioned branch: <https://doi.org/10.5281/zenodo.22334763>.
+Machine-readable citation metadata are provided in `CITATION.cff`.
 
 ## Data and code availability wording
 
