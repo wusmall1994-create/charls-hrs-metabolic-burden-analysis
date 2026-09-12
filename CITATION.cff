@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this code, please cite the archived software release."
 title: "Analysis code for functional transitions under persistent metabolic burden in CHARLS and HRS"
 type: software
-version: 1.1.0
+version: 1.1.1
 date-released: 2026-09-12
 doi: 10.5281/zenodo.22334762
 authors:
