@@ -45,6 +45,7 @@ src/formal_analysis.py                CHARLS variable construction utilities
 src/advanced_inference.py             CHARLS cohort and survey-model routines
 src/hrs_external_validation.py        HRS construction and inference routines
 src/charls_hrs_harmonized_analysis.py Cross-cohort analysis entry point
+src/enhanced_sensitivity_analysis.py  Standardized risks, E-values, physical-activity adjustment, and landmark models
 src/make_tables.py                    Descriptive and comparison tables
 src/make_figures.R                    Forest plots and sensitivity figure
 tests/test_code_release.py            Offline syntax and disclosure checks
@@ -104,13 +105,16 @@ Define the environment variables shown in `config/example.env`, then run:
 
 ```bash
 python src/charls_hrs_harmonized_analysis.py
+python src/enhanced_sensitivity_analysis.py
 python src/make_tables.py
 Rscript src/make_figures.R
 ```
 
-The first command writes model estimates and diagnostics to
-`ANALYSIS_OUTPUT_DIR`; the next two commands use those generated files to create
-tables and figures. None of these outputs should be committed to this repository.
+The first command writes the main harmonized estimates and diagnostics. The
+second writes standardized state probabilities, marginal risk contrasts,
+E-values, physical-activity-adjusted estimates, and landmark estimates. The
+remaining commands create tables and figures from generated files. None of
+these outputs should be committed to this repository.
 
 ## Verification without cohort data
 

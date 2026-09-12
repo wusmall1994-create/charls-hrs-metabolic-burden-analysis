@@ -134,7 +134,7 @@ def load_longitudinal() -> pd.DataFrame:
     stems = [
         "pmwaist", "bpsys", "bpdia", "hibpe", "diabe", "adl6a", "iadl5a", "tr20", "cesd",
         "iwstat", "agey_e", "grp", "urbrur", "mstat", "smoken", "drink", "shlt", "cancre",
-        "lunge", "hearte", "stroke", "psyche", "arthre", "wtresp",
+        "lunge", "hearte", "stroke", "psyche", "arthre", "wtresp", "vgactx", "mdactx",
     ]
     for wave in range(8, 17):
         wanted.extend(f"r{wave}{stem}" for stem in stems)
@@ -249,6 +249,11 @@ def build_window(
         np.nan,
     )
     out["grip"] = clean_numeric(out[f"r{anchor}grp"], 1, 100)
+    vigorous = clean_numeric(out[f"r{anchor}vgactx"], 1, 5)
+    moderate = clean_numeric(out[f"r{anchor}mdactx"], 1, 5)
+    any_activity = vigorous.between(1, 4) | moderate.between(1, 4)
+    activity_known = any_activity | ((vigorous == 5) & (moderate == 5))
+    out["physical_activity"] = np.where(activity_known, any_activity.astype(float), np.nan)
     social_col = f"r{anchor}socwk"
     out["social_participation"] = binary(out[social_col]) if social_col in out else np.nan
     out["log_crp"] = np.log(clean_numeric(out[f"crp_{anchor}"], 0.001))
@@ -507,8 +512,12 @@ def response_ipw(data: pd.DataFrame, observed: str, predictors: list[str], base_
 
 def prepare_completed(data: pd.DataFrame, cesd_threshold: float = 4) -> pd.DataFrame:
     out = data.copy()
-    for name in ["female", "rural", "partnered", "smoking", "drinking", "social_participation"]:
-        out[name] = np.where(out[name].notna(), (out[name] >= 0.5).astype(float), np.nan)
+    for name in [
+        "female", "rural", "partnered", "smoking", "drinking", "social_participation",
+        "physical_activity",
+    ]:
+        if name in out:
+            out[name] = np.where(out[name].notna(), (out[name] >= 0.5).astype(float), np.nan)
     out["persistent_low_depression"] = (
         (out["cesd_first"] < cesd_threshold) & (out["cesd_anchor"] < cesd_threshold)
     ).astype(float)

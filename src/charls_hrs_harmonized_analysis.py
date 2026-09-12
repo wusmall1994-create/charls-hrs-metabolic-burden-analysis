@@ -51,6 +51,10 @@ def charls_bridge_cohort() -> pd.DataFrame:
     d["cesd_first"] = pd.to_numeric(source["r1cesd10"], errors="coerce")
     d["cesd_anchor"] = pd.to_numeric(source["r3cesd10"], errors="coerce")
     d["grip"] = pd.to_numeric(source["r3gripsum"], errors="coerce")
+    d["physical_activity"] = charls_formal.any_yes(
+        charls_formal.binary(source["r3vgact_c"]),
+        charls_formal.binary(source["r3mdact_c"]),
+    )
     d["social_participation"] = pd.to_numeric(source["social_reserve"], errors="coerce")
     d["log_crp"] = pd.to_numeric(source["log_crp"], errors="coerce")
     d["log_cystatin"] = pd.to_numeric(source["log_cysc"], errors="coerce")
