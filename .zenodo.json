@@ -1,8 +1,8 @@
 {
   "title": "Analysis code for functional transitions under persistent metabolic burden in CHARLS, HRS, and ELSA",
-  "description": "Versioned statistical analysis code for coordinated CHARLS, HRS, and ELSA analyses of depressive symptoms, memory, and transitions into and out of ADL disability under persistent metabolic burden. Version 2.0.0 adds the ELSA Wave 4/6 bridge, repeated person-period transition models, random-effects summaries, and continuous-time multi-state sensitivity analyses. No participant-level data, derived data, numerical results, figures, or manuscript files are included.",
+  "description": "Versioned statistical analysis code for coordinated CHARLS, HRS, and ELSA analyses of depressive symptoms, memory, and transitions into and out of ADL disability under persistent metabolic burden. Version 2.1.0 adds full baseline confounder adjustment, stabilized longitudinal response weighting, disability-or-death and stricter-ADL sensitivities, and a model-aligned ELSA temporal-window analysis. No participant-level data, derived data, numerical results, figures, or manuscript files are included.",
   "upload_type": "software",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "access_right": "open",
   "license": "mit",
   "language": "eng",

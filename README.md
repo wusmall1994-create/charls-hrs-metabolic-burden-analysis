@@ -39,9 +39,12 @@ agreement beyond ordinary HRS registration.
 - Mortality transitions are restricted to CHARLS and HRS because complete
   post-anchor death ascertainment is unavailable in the harmonized ELSA files.
 - Models use multiple imputation, cohort biomarker weights, stabilized response
-  weights, complex-survey covariance estimation, and prespecified multiplicity
-  adjustment.
-- The fixed random seed for the harmonized analysis is `20260903`.
+  weights, full baseline confounder adjustment, and complex-survey covariance
+  estimation.
+- Sensitivity analyses use a disability-or-death composite, a threshold of two
+  or more ADL difficulties, E-values, and an alternative ELSA Waves 2/4 window
+  fitted with the same logistic estimand as the principal window.
+- The fixed random seed for the fully adjusted analysis is `20260914`.
 
 ## Repository structure
 
@@ -53,6 +56,8 @@ src/hrs_external_validation.py        HRS construction and inference routines
 src/charls_hrs_harmonized_analysis.py Cross-cohort analysis entry point
 src/enhanced_sensitivity_analysis.py  Standardized risks, E-values, physical-activity adjustment, and landmark models
 src/three_cohort_transition_analysis.py Three-cohort person-period construction, imputation, and transition models
+src/fully_adjusted_transition_analysis.py Full adjustment, longitudinal response weighting, competing-death and strict-ADL analyses
+src/elsa_external_validation.py        ELSA Waves 2/4 temporal-window construction utilities
 src/run_multistate_sensitivity.R      Continuous-time reversible-state sensitivity models
 src/run_meta_analysis.R               Random-effects summaries and heterogeneity
 src/make_transition_figures.R         Transition design and association figures
