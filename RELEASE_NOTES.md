@@ -1,5 +1,10 @@
 # Release notes
 
+## Version 2.1.1 — 2026-09-14
+
+- Refreshes the transition and cohort-flow figure code and makes the enhanced
+  analysis output directory configurable.
+
 ## Version 2.1.0 — 2026-09-14
 
 - Adds full adjustment for demographic, socioeconomic, behavioral, morbidity,

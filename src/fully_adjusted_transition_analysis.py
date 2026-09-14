@@ -9,9 +9,11 @@ import os
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
-sys.path.insert(0, str(HERE))
+SRC = Path(__file__).resolve().parent
+ROOT = SRC.parent
+HERE = Path(os.environ.get("ANALYSIS_OUTPUT_DIR", ROOT / "results")) / "transition_upgrade"
+HERE.mkdir(parents=True, exist_ok=True)
+sys.path.insert(0, str(SRC))
 
 import numpy as np
 import pandas as pd
@@ -258,4 +260,3 @@ def main():
 
 
 if __name__ == "__main__": main()
-
