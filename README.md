@@ -1,10 +1,10 @@
-# CHARLS–HRS persistent metabolic burden analysis
+# CHARLS–HRS–ELSA transition analysis under persistent metabolic burden
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22334762.svg)](https://doi.org/10.5281/zenodo.22334762)
 
-This repository contains the statistical analysis code used for the harmonized
-CHARLS–HRS study of depressive symptoms, memory, sustained activities-of-daily-
-living (ADL) independence, disability transition, and death among adults with
+This repository contains the statistical analysis code used for coordinated
+CHARLS–HRS–ELSA analyses of depressive symptoms, memory, and transitions into
+and out of activities-of-daily-living (ADL) disability among adults with
 persistent metabolic burden.
 
 ## Scope and disclosure boundary
@@ -14,12 +14,13 @@ contain participant-level data, derived data, numerical result tables, figures,
 manuscripts, submission files, credentials, contact details, or local machine
 paths. Generated outputs are ignored by Git.
 
-CHARLS and HRS files are third-party cohort data and are not redistributed.
+CHARLS, HRS, and ELSA files are third-party cohort data and are not redistributed.
 Researchers must obtain their own authorized copies and comply with the
 respective data-use conditions:
 
 - CHARLS: <https://charls.pku.edu.cn/en/>
 - HRS: <https://hrs.isr.umich.edu/data-products>
+- ELSA: <https://ukdataservice.ac.uk/> (study number 5050)
 
 HRS biomarker and sensitive-health products may require an additional data-use
 agreement beyond ordinary HRS registration.
@@ -30,8 +31,13 @@ agreement beyond ordinary HRS registration.
 - The cross-cohort bridge uses four harmonized components: waist circumference,
   blood pressure/hypertension, HbA1c/diabetes, and HDL cholesterol.
 - The bridge threshold is at least three abnormal components at both exposure
-  waves (CHARLS 2011/2015; HRS 2010/2014).
-- Functional outcomes are evaluated in 2018 and 2020.
+  waves (CHARLS 2011/2015; HRS 2010/2014; ELSA Waves 4/6).
+- Adjacent functional transitions are evaluated over two CHARLS, four HRS, and
+  three ELSA post-anchor intervals.
+- Primary models distinguish independence-to-disability incidence from
+  disability-to-independence recovery and include both psychological markers.
+- Mortality transitions are restricted to CHARLS and HRS because complete
+  post-anchor death ascertainment is unavailable in the harmonized ELSA files.
 - Models use multiple imputation, cohort biomarker weights, stabilized response
   weights, complex-survey covariance estimation, and prespecified multiplicity
   adjustment.
@@ -46,6 +52,10 @@ src/advanced_inference.py             CHARLS cohort and survey-model routines
 src/hrs_external_validation.py        HRS construction and inference routines
 src/charls_hrs_harmonized_analysis.py Cross-cohort analysis entry point
 src/enhanced_sensitivity_analysis.py  Standardized risks, E-values, physical-activity adjustment, and landmark models
+src/three_cohort_transition_analysis.py Three-cohort person-period construction, imputation, and transition models
+src/run_multistate_sensitivity.R      Continuous-time reversible-state sensitivity models
+src/run_meta_analysis.R               Random-effects summaries and heterogeneity
+src/make_transition_figures.R         Transition design and association figures
 src/make_tables.py                    Descriptive and comparison tables
 src/make_figures.R                    Forest plots and sensitivity figure
 tests/test_code_release.py            Offline syntax and disclosure checks
@@ -86,6 +96,15 @@ biomk10bl_r.dta
 biomk14bl.dta
 ```
 
+Set `ELSA_DATA_DIR` to the UK Data Service SN 5050 Stata directory containing:
+
+```text
+gh_elsa_h.dta
+wave_4_nurse_data.dta
+wave_6_elsa_nurse_data_v2.dta
+wave_6_elsa_data_eul.dta
+```
+
 File and variable names follow the releases used in the analysis. If a provider
 revises a filename while retaining equivalent variables, update the path mapping
 at the top of the corresponding source module and record the change in a new
@@ -106,6 +125,10 @@ Define the environment variables shown in `config/example.env`, then run:
 ```bash
 python src/charls_hrs_harmonized_analysis.py
 python src/enhanced_sensitivity_analysis.py
+python src/three_cohort_transition_analysis.py
+Rscript src/run_meta_analysis.R
+Rscript src/run_multistate_sensitivity.R
+Rscript src/make_transition_figures.R
 python src/make_tables.py
 Rscript src/make_figures.R
 ```
@@ -137,7 +160,7 @@ Machine-readable citation metadata are provided in `CITATION.cff`.
 ## Data and code availability wording
 
 The statistical code is openly available from this repository and its versioned
-archival DOI. The participant-level CHARLS and HRS data are not redistributed by
-the authors because they are third-party cohort resources; qualified researchers
-may obtain access directly from the respective study websites under their data-
-use procedures.
+archival DOI. Participant-level CHARLS, HRS, and ELSA data are not redistributed
+because they are third-party cohort resources. Qualified researchers may obtain
+access directly from the respective study websites under their data-use
+procedures.

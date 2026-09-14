@@ -5,3 +5,5 @@ readr==2.2.0
 dplyr==1.2.1
 svglite==2.2.2
 ragg==1.5.2
+msm==1.8.2
+metafor==4.8-0
