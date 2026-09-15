@@ -1,5 +1,12 @@
 # Release notes
 
+## Version 2.2.1 — 2026-09-15
+
+- Adds Rubin-pooled multivariable Wald tests for the nonlinear restricted-cubic-spline terms.
+- Adds fully adjusted, response-weighted estimates for each follow-up interval and after exclusion of the first post-anchor interval.
+- Annotates the spline figure with cohort-specific nonlinearity P values.
+- Maintains the code-only release boundary; no manuscripts, data, numerical outputs, figures, local paths, credentials, or personal contact details are included.
+
 ## Version 2.2.0 — 2026-09-15
 
 - Makes the cohort-standardized continuous two-wave depressive symptom burden

@@ -23,11 +23,15 @@ save_three <- function(plot, stem, width = 7.09, height = 4.4) {
 primary <- read.csv(file.path(source_root, "jad_primary_models.csv"), stringsAsFactors = FALSE)
 timing <- read.csv(file.path(source_root, "jad_covariate_timing.csv"), stringsAsFactors = FALSE)
 spline <- read.csv(file.path(source_root, "jad_spline_curves.csv"), stringsAsFactors = FALSE)
+spline_tests <- read.csv(file.path(source_root, "jad_spline_nonlinearity.csv"), stringsAsFactors = FALSE)
+interval_sensitivity <- read.csv(file.path(source_root, "jad_interval_sensitivity.csv"), stringsAsFactors = FALSE)
 atten <- read.csv(file.path(source_root, "jad_attenuation_matrix.csv"), stringsAsFactors = FALSE)
 
 write.csv(primary, file.path(root, "jad_primary_models.csv"), row.names = FALSE)
 write.csv(timing, file.path(root, "jad_covariate_timing.csv"), row.names = FALSE)
 write.csv(spline, file.path(root, "jad_spline_curves.csv"), row.names = FALSE)
+write.csv(spline_tests, file.path(root, "jad_spline_nonlinearity.csv"), row.names = FALSE)
+write.csv(interval_sensitivity, file.path(root, "jad_interval_sensitivity.csv"), row.names = FALSE)
 write.csv(atten, file.path(root, "jad_attenuation_matrix.csv"), row.names = FALSE)
 
 meta_rows <- list()
@@ -68,15 +72,27 @@ p1 <- ggplot(primary, aes(estimate, label, color = marker, shape = marker)) +
 save_three(p1, "Figure_1_primary_associations", height = 4.2)
 
 spline$cohort <- factor(spline$cohort, levels = c("CHARLS", "HRS", "ELSA"))
+spline_tests$cohort <- factor(spline_tests$cohort, levels = c("CHARLS", "HRS", "ELSA"))
+spline_tests$label <- sprintf("P for nonlinearity = %.3f", spline_tests$p_nonlinearity)
+p_locations <- merge(
+  aggregate(burden_z ~ cohort, spline, min),
+  aggregate(ci_high ~ cohort, spline, max), by = "cohort"
+)
+names(p_locations)[names(p_locations) == "burden_z"] <- "x"
+names(p_locations)[names(p_locations) == "ci_high"] <- "y"
+p_locations <- merge(p_locations, spline_tests[c("cohort", "label")], by = "cohort")
 p2 <- ggplot(spline, aes(burden_z, estimate)) +
   geom_hline(yintercept = 1, linetype = 2, linewidth = 0.4, color = "#666666") +
   geom_ribbon(aes(ymin = ci_low, ymax = ci_high), fill = "#56B4E9", alpha = 0.25) +
   geom_line(color = "#0072B2", linewidth = 0.8) +
+  geom_text(data = p_locations, aes(x = x, y = y, label = label),
+            inherit.aes = FALSE, hjust = 0, vjust = 1.2, size = 2.7) +
   facet_wrap(~cohort, nrow = 1) +
   scale_y_log10(breaks = c(0.5, 0.75, 1, 1.5, 2, 3)) +
   labs(x = "Two-wave depressive symptom burden (cohort-standardized SD)",
        y = "Adjusted odds ratio (reference = cohort mean)",
-       caption = "Restricted cubic splines use knots at the 5th, 35th, 65th, and 95th percentiles; shaded bands are 95% confidence intervals.") +
+       caption = paste0("Restricted cubic splines use knots at the 5th, 35th, 65th, and 95th percentiles.\n",
+                        "Shaded bands are 95% confidence intervals; P values are Rubin-pooled Wald tests of the nonlinear terms.")) +
   theme(panel.grid.minor = element_blank(), strip.text = element_text(face = "bold"),
         plot.caption = element_text(hjust = 0, size = 8))
 save_three(p2, "Figure_2_exposure_response", height = 3.7)

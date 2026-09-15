@@ -118,7 +118,8 @@ METABOLIC = ["met_anchor_z"]
 
 def add_intervals(q: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     z = q.copy(); terms=[]
-    for k in range(2, int(z.interval.max()) + 1):
+    observed_intervals = sorted(int(k) for k in z.interval.dropna().unique())
+    for k in observed_intervals[1:]:
         nm=f"interval_{k}"; z[nm]=z.interval.eq(k).astype(float); terms.append(nm)
     return z, terms
 
@@ -179,7 +180,7 @@ def rcs_basis(x: np.ndarray, knots: np.ndarray) -> np.ndarray:
     return np.column_stack(cols)
 
 
-def fit_spline(q: pd.DataFrame, knots: np.ndarray, grid: np.ndarray) -> list[dict]:
+def fit_spline(q: pd.DataFrame, knots: np.ndarray, grid: np.ndarray) -> tuple[list[dict], dict]:
     z=q[q.origin.eq(0)].copy(); z=add_response_weight(z,HEALTH_FIRST)
     z=z[z.destination.isin([0,1])].copy(); z["event"]=z.destination.eq(1).astype(float)
     z,intervals=add_intervals(z)
@@ -197,12 +198,41 @@ def fit_spline(q: pd.DataFrame, knots: np.ndarray, grid: np.ndarray) -> list[dic
         contrast=row-ref; b=float(contrast@beta); v=float(contrast@cov@contrast)
         out.append({"grid":float(x),"b":b,"v":v,"df":ans["design_df"],
                     "records":ans["n"],"events":ans["events"]})
-    return out
+    nonlinear_idx = idx[1:]
+    nonlinear = {
+        "q": ans["beta"][nonlinear_idx],
+        "u": ans["cov"][np.ix_(nonlinear_idx, nonlinear_idx)],
+        "df": ans["design_df"],
+        "records": ans["n"],
+        "events": ans["events"],
+    }
+    return out, nonlinear
+
+
+def pool_multivariate_wald(fits: list[dict], **meta) -> dict:
+    """Rubin-pool a multivariate coefficient vector and test that it equals zero."""
+    q = np.stack([f["q"] for f in fits])
+    ubar = np.mean(np.stack([f["u"] for f in fits]), axis=0)
+    m = len(fits)
+    between = np.cov(q, rowvar=False, ddof=1) if m > 1 else np.zeros_like(ubar)
+    total = ubar + (1 + 1 / m) * between
+    qbar = q.mean(axis=0)
+    wald = float(qbar @ np.linalg.pinv(total) @ qbar)
+    test_df = int(qbar.size)
+    return {
+        **meta,
+        "records": int(np.median([f["records"] for f in fits])),
+        "events": int(np.median([f["events"] for f in fits])),
+        "wald_chi2": wald,
+        "test_df": test_df,
+        "p_nonlinearity": float(stats.chi2.sf(wald, test_df)),
+        "imputations": m,
+    }
 
 
 def main():
     cohorts, years = load_cohorts()
-    primary=[]; timing=[]; quartiles=[]; attenuation=[]; splines=[]; missing=[]
+    primary=[]; timing=[]; quartiles=[]; attenuation=[]; splines=[]; spline_tests=[]; interval_sensitivity=[]; missing=[]
     for cohort,d in cohorts.items():
         missing.append({"cohort":cohort,"n":len(d),**{v:int(d[v].notna().sum()) for v in
                        ["comorbidity_first","self_health_first","comorbidity","self_health"]}})
@@ -225,6 +255,9 @@ def main():
         knots=np.quantile(observed,[.05,.35,.65,.95])
         grid=np.linspace(np.quantile(observed,.05),np.quantile(observed,.95),41)
         spline_store={float(x):[] for x in grid}
+        spline_nonlinear=[]
+        interval_store={f"interval_{k}":[] for k in range(1,len(years[cohort]))}
+        interval_store["exclude_first_interval"]=[]
         for z in imputed_sets(d):
             pp=person_period(z,years[cohort])
             specs={
@@ -244,7 +277,14 @@ def main():
             for (ex,stage,w) in att:
                 f=fit(pp,ex,stages[stage],w)
                 if f: att[(ex,stage,w)].append(f)
-            for row in fit_spline(pp,knots,grid): spline_store[row["grid"]].append(row)
+            spline_rows, nonlinear_fit = fit_spline(pp,knots,grid)
+            for row in spline_rows: spline_store[row["grid"]].append(row)
+            spline_nonlinear.append(nonlinear_fit)
+            for k in range(1,len(years[cohort])):
+                f=fit(pp[pp.interval.eq(k)],"depression_burden_z",DEMOGRAPHIC+BEHAVIOR+HEALTH_FIRST+METABOLIC,True)
+                if f: interval_store[f"interval_{k}"].append(f)
+            f=fit(pp[pp.interval.gt(1)],"depression_burden_z",DEMOGRAPHIC+BEHAVIOR+HEALTH_FIRST+METABOLIC,True)
+            if f: interval_store["exclude_first_interval"].append(f)
         for name,vals in stores.items():
             exposure="memory_z" if name.startswith("memory") else ("persistent_low_depression" if name.startswith("binary") else "depression_burden_z")
             row=pool(vals,cohort=cohort,analysis=name,exposure=exposure,measure="OR")
@@ -255,11 +295,18 @@ def main():
             attenuation.append(pool(vals,cohort=cohort,exposure=ex,stage=stage,response_weighted=w,measure="OR"))
         for x,vals in spline_store.items():
             splines.append(pool(vals,cohort=cohort,burden_z=x,reference_z=0,measure="OR"))
+        spline_tests.append(pool_multivariate_wald(spline_nonlinear,cohort=cohort,test="nonlinear_spline_terms"))
+        for analysis,vals in interval_store.items():
+            if vals:
+                interval_sensitivity.append(pool(vals,cohort=cohort,analysis=analysis,
+                                                 exposure="depression_burden_z",measure="OR"))
     pd.DataFrame(primary).to_csv(HERE/"jad_primary_models.csv",index=False)
     pd.DataFrame(timing).to_csv(HERE/"jad_covariate_timing.csv",index=False)
     pd.DataFrame(quartiles).to_csv(HERE/"jad_burden_quartiles.csv",index=False)
     pd.DataFrame(attenuation).to_csv(HERE/"jad_attenuation_matrix.csv",index=False)
     pd.DataFrame(splines).to_csv(HERE/"jad_spline_curves.csv",index=False)
+    pd.DataFrame(spline_tests).to_csv(HERE/"jad_spline_nonlinearity.csv",index=False)
+    pd.DataFrame(interval_sensitivity).to_csv(HERE/"jad_interval_sensitivity.csv",index=False)
     pd.DataFrame(missing).to_csv(HERE/"jad_first_wave_covariate_audit.csv",index=False)
 
 
