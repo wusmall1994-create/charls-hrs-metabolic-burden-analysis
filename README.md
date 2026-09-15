@@ -57,10 +57,12 @@ src/charls_hrs_harmonized_analysis.py Cross-cohort analysis entry point
 src/enhanced_sensitivity_analysis.py  Standardized risks, E-values, physical-activity adjustment, and landmark models
 src/three_cohort_transition_analysis.py Three-cohort person-period construction, imputation, and transition models
 src/fully_adjusted_transition_analysis.py Full adjustment, longitudinal response weighting, competing-death and strict-ADL analyses
+src/jad_continuous_burden_analysis.py First-wave health timing, continuous burden, spline, and attenuation analyses
 src/elsa_external_validation.py        ELSA Waves 2/4 temporal-window construction utilities
 src/run_multistate_sensitivity.R      Continuous-time reversible-state sensitivity models
 src/run_meta_analysis.R               Random-effects summaries and heterogeneity
 src/make_transition_figures.R         Transition design and association figures
+src/make_jad_figures.R                Continuous-burden forest, spline, and attenuation figures
 src/make_tables.py                    Descriptive and comparison tables
 src/make_figures.R                    Forest plots and sensitivity figure
 tests/test_code_release.py            Offline syntax and disclosure checks
@@ -131,9 +133,12 @@ Define the environment variables shown in `config/example.env`, then run:
 python src/charls_hrs_harmonized_analysis.py
 python src/enhanced_sensitivity_analysis.py
 python src/three_cohort_transition_analysis.py
+python src/fully_adjusted_transition_analysis.py
+python src/jad_continuous_burden_analysis.py
 Rscript src/run_meta_analysis.R
 Rscript src/run_multistate_sensitivity.R
 Rscript src/make_transition_figures.R
+Rscript src/make_jad_figures.R
 python src/make_tables.py
 Rscript src/make_figures.R
 ```

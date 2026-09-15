@@ -1,5 +1,17 @@
 # Release notes
 
+## Version 2.2.0 — 2026-09-15
+
+- Makes the cohort-standardized continuous two-wave depressive symptom burden
+  the principal harmonized exposure for the disability-transition analysis.
+- Adds full models using first-biomarker-wave morbidity and self-rated health,
+  with anchor-wave covariate timing as a sensitivity analysis.
+- Adds restricted cubic spline exposure–response estimates and a staged
+  covariate-attenuation matrix with and without longitudinal response weights.
+- Adds JAD-oriented forest, spline, and attenuation figure code.
+- Maintains the code-only release boundary; no manuscripts, data, numerical
+  outputs, figures, local paths, credentials, or personal contact details are included.
+
 ## Version 2.1.1 — 2026-09-14
 
 - Refreshes the transition and cohort-flow figure code and makes the enhanced
