@@ -1,5 +1,15 @@
 # Release notes
 
+## Version 2.2.2 — 2026-09-15
+
+- Adds the principal continuous two-wave depressive symptom-burden analysis to
+  the ELSA Waves 2/4 temporal-window sensitivity analysis.
+- Uses Wave 2 morbidity and self-rated health, biomarker and response weights,
+  and the same survey-weighted logistic OR estimand as the principal ELSA window.
+- Retains the threshold-based and memory estimates as secondary analyses.
+- Maintains the code-only release boundary; no manuscripts, data, numerical
+  outputs, figures, local paths, credentials, or personal contact details are included.
+
 ## Version 2.2.1 — 2026-09-15
 
 - Adds Rubin-pooled multivariable Wald tests for the nonlinear restricted-cubic-spline terms.

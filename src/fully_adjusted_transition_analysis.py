@@ -237,7 +237,7 @@ def main():
             if vals: rows.append(pool(vals,cohort=cohort,transition="incidence",model="live",threshold="two_or_more_ADL",variable=f,measure="OR"))
     # Same estimand/model for the alternative ELSA exposure window.
     d=early_elsa(); pp0=pp_make(d,[4,6]); ret.append(retention(pp0,"ELSA_early"))
-    fs={f:[] for f in ["persistent_low_depression","memory_z"]}
+    fs={f:[] for f in ["persistent_low_depression","lower_depression_burden_z","memory_z"]}
     for z in imputed_sets(d):
         pp=pp_make(z,[4,6])
         for f in fs:

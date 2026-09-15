@@ -42,9 +42,11 @@ agreement beyond ordinary HRS registration.
   weights, full baseline confounder adjustment, and complex-survey covariance
   estimation.
 - Sensitivity analyses use a disability-or-death composite, a threshold of two
-  or more ADL difficulties, E-values, and an alternative ELSA Waves 2/4 window
-  fitted with the same logistic estimand as the principal window.
-- The fixed random seed for the fully adjusted analysis is `20260914`.
+  or more ADL difficulties, E-values, and an alternative ELSA Waves 2/4 window.
+  The alternative window applies the same continuous symptom-burden construction,
+  first-wave health-covariate strategy, response weighting, and logistic estimand
+  as the principal window.
+- The fixed random seed for the JAD-focused continuous analysis is `20260915`.
 
 ## Repository structure
 

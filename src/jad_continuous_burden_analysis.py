@@ -19,6 +19,7 @@ from statsmodels.imputation.mice import MICEData
 
 import three_cohort_transition_analysis as base
 import fully_adjusted_transition_analysis as enh
+import elsa_external_validation as elsa_early
 
 SEED = 20260915
 M = 20
@@ -66,6 +67,42 @@ def load_cohorts() -> tuple[dict[str, pd.DataFrame], dict[str, list[int]]]:
         cohorts[name]["cohort"] = name
     years = {"CHARLS":[2015,2018,2020], "HRS":[2014,2016,2018,2020,2022], "ELSA":[6,7,8,9]}
     return cohorts, years
+
+
+def load_early_elsa() -> pd.DataFrame:
+    """Construct the ELSA Waves 2/4 temporal-window sensitivity cohort."""
+    d = elsa_early.derive_analysis_variables(elsa_early.read_source_data())
+    common_components = ["waist", "bp", "glycemia", "hdl"]
+    score2 = d[[f"{v}_w2_component" for v in common_components]].sum(axis=1, min_count=4)
+    score4 = d[[f"{v}_w4_component" for v in common_components]].sum(axis=1, min_count=4)
+    eligible = (
+        (d["age"] >= 50) & score2.notna() & score4.notna()
+        & (score2 >= 3) & (score4 >= 3)
+        & d["baseline_independent"].eq(1)
+        & d["blood_weight_w4"].gt(0)
+        & d["design_stratum_raw"].notna() & d["design_psu_raw"].notna()
+    )
+    x = d.loc[eligible].copy().reset_index(drop=True)
+    x["person_id"] = pd.to_numeric(x["idauniq"], errors="coerce")
+    x["blood_weight"] = x["blood_weight_w4"]
+    x["design_stratum"] = pd.factorize(x["design_stratum_raw"], sort=True)[0]
+    x["design_psu"] = pd.factorize(x["design_psu_raw"], sort=True)[0]
+    x["met_anchor"] = score4.loc[eligible].to_numpy()
+    x["memory_first"] = x["memory_w2"]
+    x["memory_anchor"] = x["memory_w4"]
+    x["cesd_first"] = x["cesd_w2"]
+    x["cesd_anchor"] = x["cesd_w4"]
+    x["state_4"] = 0.0
+    x["state_6"] = x["w6_state"]
+    x["cohort"] = "ELSA_early"
+
+    cols = ["idauniq", "r2shlt"] + [f"r2{s}" for s in DISEASE_ELSA]
+    h = pd.read_stata(base.ELSA / "gh_elsa_h.dta", columns=cols, convert_categoricals=False)
+    h["self_health_first"] = base.clean(h["r2shlt"], 1, 5)
+    h["comorbidity_first"] = binary_sum(h[[f"r2{s}" for s in DISEASE_ELSA]])
+    x = x.merge(h[["idauniq", "self_health_first", "comorbidity_first"]],
+                on="idauniq", how="left", validate="one_to_one")
+    return x
 
 
 RAW_IMPUTE = ["age", "female", "education", "rural", "partnered", "smoking", "drinking",
@@ -300,6 +337,21 @@ def main():
             if vals:
                 interval_sensitivity.append(pool(vals,cohort=cohort,analysis=analysis,
                                                  exposure="depression_burden_z",measure="OR"))
+    early = load_early_elsa()
+    early_fits = []
+    for z in imputed_sets(early):
+        pp = person_period(z, [4, 6])
+        f = fit(pp, "depression_burden_z", DEMOGRAPHIC + BEHAVIOR + HEALTH_FIRST + METABOLIC, True)
+        if f:
+            early_fits.append(f)
+    early_result = pool(
+        early_fits,
+        cohort="ELSA",
+        analysis="waves_2_4_continuous_first_health",
+        exposure="depression_burden_z",
+        measure="OR",
+    )
+
     pd.DataFrame(primary).to_csv(HERE/"jad_primary_models.csv",index=False)
     pd.DataFrame(timing).to_csv(HERE/"jad_covariate_timing.csv",index=False)
     pd.DataFrame(quartiles).to_csv(HERE/"jad_burden_quartiles.csv",index=False)
@@ -308,6 +360,7 @@ def main():
     pd.DataFrame(spline_tests).to_csv(HERE/"jad_spline_nonlinearity.csv",index=False)
     pd.DataFrame(interval_sensitivity).to_csv(HERE/"jad_interval_sensitivity.csv",index=False)
     pd.DataFrame(missing).to_csv(HERE/"jad_first_wave_covariate_audit.csv",index=False)
+    pd.DataFrame([early_result]).to_csv(HERE/"jad_elsa_early_continuous.csv",index=False)
 
 
 if __name__ == "__main__":

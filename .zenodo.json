@@ -1,8 +1,8 @@
 {
   "title": "Analysis code for functional transitions under persistent metabolic burden in CHARLS, HRS, and ELSA",
-  "description": "Versioned statistical analysis code for coordinated CHARLS, HRS, and ELSA analyses of depressive symptoms, memory, and transitions into and out of ADL disability under persistent metabolic burden. Version 2.2.1 adds Rubin-pooled Wald tests for nonlinear spline terms and interval-specific and delayed-entry sensitivity analyses using the principal continuous exposure. No participant-level data, derived data, numerical results, figures, or manuscript files are included.",
+  "description": "Versioned statistical analysis code for coordinated CHARLS, HRS, and ELSA analyses of depressive symptoms, memory, and transitions into and out of ADL disability under persistent metabolic burden. Version 2.2.2 adds a continuous two-wave depressive symptom-burden analysis for the alternative ELSA Waves 2/4 temporal window using first-wave health covariates and the same weighted logistic estimand as the principal window. No participant-level data, derived data, numerical results, figures, or manuscript files are included.",
   "upload_type": "software",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "access_right": "open",
   "license": "mit",
   "language": "eng",
